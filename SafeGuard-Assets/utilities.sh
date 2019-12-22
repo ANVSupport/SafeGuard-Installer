@@ -63,10 +63,9 @@ firstIteration() {
 	##moxa set up
 	moxadir=${HOME_DIR}/moxa-config
 	mkdir "${moxadir}"
-	mv "${repoPath}/SafeGuard-Assets/moxa_e1214.sh" "${moxadir}/moxa_e1214.sh"
-	mv "${repoPath}/SafeGuard-Assets/cameraList.json ${moxadir}/cameraList.json" && successfulPrint "Moxa setup"
+	mv "${repoPath}/SafeGuard-Assets/moxa_e1214.sh" "${moxadir}"/moxa_e1214.sh
+	mv "${repoPath}"/SafeGuard-Assets/cameraList.json "${moxadir}"/cameraList.json && successfulPrint "Moxa setup"
 	chmod +x "${moxadir}"* && chown user "${moxadir}"*
-
 	cat << "EOF"
 	 _____              _          _  _  _                    _____          __        _____                         _          
 	|_   _|            | |        | || |(_)                  / ____|        / _|      / ____|                       | |         
@@ -84,6 +83,7 @@ EOF
 	##make script auto run after login
 	local startupFile
 	startupFile=etc/gdm3/PostLogin/Default
+	touch "{startupFile}"
 	echo "#! /bin/sh" > ${startupFile}
 	tee -a ${startupFile} <<EOF && successfulPrint "Startup added" # EOF without quotations or backslash evaluates variables
 gnome-terminal -- sh -c '${repoPath}/SafeGuard-Assets/launchAsRoot.sh'
