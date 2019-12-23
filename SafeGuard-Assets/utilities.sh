@@ -45,8 +45,8 @@ firstIteration() {
 	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
 	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
 	if [[ -f /var/lib/dpkg/lock || -f /var/lib/dpkg/lock-frontend ]]; then
-		echo "${printRed}""Lock Could not be deleted, is the update center open?"
-		read -p "Please close anything that uses apt and enter y when finished. Press N to abort: ""${printWhite}" -n 1 -r $cont
+		echo "${printRed}""Lock Could not be deleted, is the update center open?""${printWhite}"
+		read -p "Please close anything that uses apt and enter y when finished. Press N to abort: " -n 1 -r $cont
 		case "$cont" in
 		y|Y) installUtils;;
 		n|N) echo "Exiting..."; exit 1;;
@@ -136,7 +136,7 @@ EOF
 	successfulPrint "System Clean"
 }
 installUtils(){
-	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
+	rm -f /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
 	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
 	apt-get install vlc curl vim htop net-tools expect > /dev/null &
 	progressBar 15
