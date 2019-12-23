@@ -43,7 +43,8 @@ firstIteration() {
 	echo "==========================================================="
 	echo "                   ${printCyan}Installing Utilities...${printWhite}                "
 	echo "==========================================================="
-	apt-get install vlc curl vim htop net-tools expect parted -yqq --show-progress && successfulPrint "Utilities"
+	apt-get install vlc curl vim htop net-tools expect parted -yqq > /dev/null &
+	progressBar 15
 	chmod -R +x "${repoPath}"*
 	cp "${repoPath}"/SafeGuard-Assets/SGLogo.jpg "${HOME_DIR}"/Desktop/SGLogo.jpg
 	apt-get install "${repoPath}/Teamviewer.deb" -y -qq && successfulPrint "TeamViewer" ## To test
@@ -66,6 +67,7 @@ firstIteration() {
 	mv "${repoPath}/SafeGuard-Assets/moxa_e1214.sh" "${moxadir}"/moxa_e1214.sh
 	mv "${repoPath}"/SafeGuard-Assets/cameraList.json "${moxadir}"/cameraList.json && successfulPrint "Moxa setup"
 	chmod +x "${moxadir}"* && chown user "${moxadir}"*
+
 	cat << "EOF"
 	 _____              _          _  _  _                    _____          __        _____                         _          
 	|_   _|            | |        | || |(_)                  / ____|        / _|      / ____|                       | |         
@@ -82,15 +84,26 @@ EOF
 
 	##make script auto run after login
 	local startupFile
-	startupFile=etc/gdm3/PostLogin/Default
-	touch "{startupFile}"
-	echo "#! /bin/sh" > ${startupFile}
+	local startupDir
+	startupDir=${HOME_DIR}/.config/autostart
+	mkdir -R "${startupDir}"
+	startupFile="${startupDir}"/secondIteration.desktop
+	> "${startupFile}" # create startup file
 	tee -a ${startupFile} <<EOF && successfulPrint "Startup added" # EOF without quotations or backslash evaluates variables
-gnome-terminal -- sh -c '${repoPath}/SafeGuard-Assets/launchAsRoot.sh'
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal -- sh -c '${repoPath}/SafeGuard-Assets/launchAsRoot.sh'
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_NG]=Terminal
+Name=Terminal
+Comment[en_NG]=Start Terminal On Startup
+Comment=Start Terminal On Startup
 EOF
 chmod +x ${startupFile}
-ln -s "${repoPath}"/SafeGuard-Assets/launchAsRoot.sh "${HOME_DIR}"/Desktop/RunThis.sh # right order? TO TEST
-chmod +x "${HOME_DIR}"/Desktop/RunThis.sh
+ln -s "${repoPath}"/SafeGuard-Assets/secondIteration.sh "${HOME_DIR}"/Desktop/runThisAsRoot.sh
+chmod +x "${HOME_DIR}"/Desktop/runThisAsRoot.sh
 echo "xhost +" >> "${HOME_DIR}"/.profile
 }
 clean(){
@@ -124,4 +137,18 @@ failedPrint(){
 	echo -e "=================================================================="
 	echo -e "                    $1 ....${printRed}Failed!${printWhite}                  "
 	echo -e "=================================================================="
+}
+progressBar() {
+  local duration=${1}
+    already_done() { for ((done=0; done<$elapsed; done++)); do printf "▇"; done }
+    remaining() { for ((remain=$elapsed; remain<$duration; remain++)); do printf " "; done }
+    percentage() { printf "| %s%%" $(( (($elapsed)*100)/($duration)*100/100 )); }
+    clean_line() { printf "\r"; }
+
+  for (( elapsed=1; elapsed<=$duration; elapsed++ )); do
+      already_done; remaining; percentage
+      sleep 1
+      clean_line
+  done
+  clean_line
 }
