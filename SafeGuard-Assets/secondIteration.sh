@@ -14,10 +14,10 @@ SecondIteration(){
 	dockerfile=/home/user/docker-compose/1.20.0/docker-compose.yml
 	echo "Dockerfile set as:"
 	echo ${dockerfile}
-	local isInFile
-	isInFile=$( < /home/user/docker-compose/1.20.0/env/broadcaster.env grep -c "/moxa_e1214.sh")
+	local isMoxaInBroadcaster
+	isMoxaInBroadcaster=$( < /{H}/docker-compose/1.20.0/env/broadcaster.env grep -c "/moxa_e1214.sh")
 	##check if script has been run before, to not add duplicates
-	if [ "$isInFile" -eq 0 ]; then
+	if [ "$isMoxaInBroadcaster" -eq 0 ]; then
 		tee -a /home/user/docker-compose/1.20.0/env/broadcaster.env <<'EOF'
 		## Modbus plugin integration
 		BCAST_MODBUS_IS_ENABLED=true
@@ -28,9 +28,16 @@ EOF
 		echo "It seems the script has been run already, skipping broadcaster edits..."
 	fi
 	##doesnt hurt to run again since it's replacing not appending.
-	line=$(grep -nF broadcaster.tls.ai /home/user/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
 	host=$(hostname)
-	sed -i "${line}i \      - \/home\/user\/moxa-config:\/home\/user\/moxa-config" ${dockerfile}
+	local isMoxaInYaml
+	isMoxaInYaml=$( < {HOME_DIR}/docker-compose/1.20.0/docker-compose.yml grep -c "moxa-config")
+	if ["${isMoxaInYaml}" -eq 0]; then
+		line=$(grep -nF broadcaster.tls.ai {HOME_DIR}/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
+		sed -i "${line}i \      - \/home\/user\/moxa-config:\/home\/user\/moxa-config" ${dockerfile}
+	else
+		echo "${printRed}""Moxa Edit already in Yml, skipping...""${printWhite}"
+	fi
+
 	sed -i "s|nginx-\${node_name:-localnode}.tls.ai|nginx-$host.tls.ai|g" ${dockerfile}
 	sed -i "s|api.tls.ai|api-$host.tls.ai|g" ${dockerfile} && SuccesfulPrint "Modify docker files"
 	cd /home/user/docker-compose/1.20.0/ || exit 1
@@ -39,16 +46,16 @@ EOF
 	else
 		echo FailedPrint "docker-compose image pull"
 		echo "Images failed to pull, Perhaps the token timed out?"
-		echo "${printRed}""Generate a new token and login manually, then run RunThis.sh from the desktop""${printWhite}"
+		echo "${printRed}""Generate a new token and login manually, then run runThisAsRoot.sh from the desktop""${printWhite}"
 		exit 1
 	fi
 
 	sleep 10
 	footprint=$(docker exec -it "$(docker ps | grep backend | awk '{print $1}')" license-ver -o)
 	echo "Footprint: ""${printCyan}""${footprint}""${printWhite}"
-	echo "2" > /opt/sg.f ##marks second iteration has happened
-	sed '/gnome-terminal/d' /etc/gdm3/PostLogin/Default && SuccesfulPrint "Remove startup line" ## to test
-	rm "${HOME_DIR}"/Desktop/RunThis.sh
+	echo "2" > /opt/sg.f && SuccesfulPrint "Remove flag" ##marks second iteration has happened
+	rm -f "${HOME_DIR}"/.config/autostart/secondIteration.desktop && SuccesfulPrint "Remove Startup"
+	rm "${HOME_DIR}"/Desktop/runThisAsRoot.sh
 	cat << "EOF"
 	 _____   ____  _   _ ______ 
 	|  __ \ / __ \| \ | |  ____|
