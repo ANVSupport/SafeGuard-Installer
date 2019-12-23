@@ -44,17 +44,7 @@ firstIteration() {
 	chmod -R +x "${repoPath}"*
 	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
 	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
-	if [[ -f /var/lib/dpkg/lock || -f /var/lib/dpkg/lock-frontend ]]; then
-		echo "${printRed}""Lock Could not be deleted, is the update center open?""${printWhite}"
-		read -p "Please close anything that uses apt and enter y when finished. Press N to abort: " -n 1 -r $cont
-		case "$cont" in
-		y|Y) installUtils;;
-		n|N) echo "Exiting..."; exit 1;;
-		*) echo "Invalid choice, Exiting.."; exit 1;;
-		esac
-	else
-		installUtils
-	fi
+	installUtils
 	cp "${repoPath}"/SafeGuard-Assets/SGLogo.jpg "${HOME_DIR}"/Desktop/SGLogo.jpg
 	apt-get install "${repoPath}/Teamviewer.deb" > /dev/null && successfulPrint "TeamViewer" ## To test
 	mv "${repoPath}/SafeGuard-Assets/secondIteration.sh" /opt/secondIteration.sh # prepare it to be run after reboot
@@ -138,7 +128,7 @@ EOF
 installUtils(){
 	rm -f /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
 	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
-	apt-get install vlc curl vim htop net-tools expect > /dev/null &
+	apt-get install vlc curl vim htop net-tools expect -y > /dev/null &
 	progressBar 15
 }
 successfulPrint(){
