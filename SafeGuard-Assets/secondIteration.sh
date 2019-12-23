@@ -11,6 +11,7 @@ export printGreen=$'\e[1;32m'
 export HOME_DIR
 HOME_DIR=$(eval echo ~"$(logname)")
 SecondIteration(){
+	bash /opt/docker_login.sh
 	dockerfile=/home/user/docker-compose/1.20.0/docker-compose.yml
 	echo "Dockerfile set as:"
 	echo ${dockerfile}
@@ -58,6 +59,7 @@ EOF
 	echo "2" > /opt/sg.f && SuccesfulPrint "Remove flag" ##marks second iteration has happened
 	rm -f "${HOME_DIR}"/.config/autostart/secondIteration.desktop && SuccesfulPrint "Remove Startup"
 	rm "${HOME_DIR}"/Desktop/runThisAsRoot.sh
+	rm /opt/docker_login.sh
 	sed '/docker/d' "${HOME_DIR}"/.profile
 	cat << "EOF"
 	 _____   ____  _   _ ______ 

@@ -9,16 +9,11 @@ export printRed=$'\e[1;31m'
 export printCyan=$'\e[1;36m'
 # Absolute path to this script
 SCRIPT=$(readlink -f "$0")
-echo "SCRIPT  DIR:"
-echo "${SCRIPT}"
 # Absolute path to the script directory
 BASEDIR=$(dirname "$SCRIPT")
-echo "BASEDIR:"
-echo "${BASEDIR}"
-HOME_DIR=$(eval echo ~"$(logname)")
+export HOME_DIR=$(eval echo ~"$(logname)")
 echo "HOME_DIR: "
-echo "${HOME_DIR}"
-
+echo "$${printCyan}""${HOME_DIR}""${printWhite}"
 
 firstIteration() {
 	local token="$1"
@@ -133,6 +128,7 @@ installUtils(){
 	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
 	apt-get install vlc curl vim htop net-tools expect -y > /dev/null &
 	progressBar 15
+	wait
 }
 successfulPrint(){
 	echo -e "=================================================================="

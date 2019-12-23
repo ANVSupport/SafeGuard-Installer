@@ -223,7 +223,9 @@ usermod -aG docker $(logname)
 [[ "${DASHBOARD}" == "true" ]] && download-dashboard "${DOCKER_COMPOSE_DIR}/${BRANCH}/docker-compose.yml"
 chown -R $(logname):$(logname) ${HOME_DIR}
 docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io"
-echo docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io" >> "${HOME_DIR}"/.profile
+echo \#! /bin/bash > /opt/docker_login.sh
+echo docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io" >> /opt/docker_login.sh
+chmod +x /opt/docker_login.sh
 
 
 pushd ${DOCKER_COMPOSE_DIR}/${BRANCH}
