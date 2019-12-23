@@ -15,7 +15,7 @@ SecondIteration(){
 	echo "Dockerfile set as:"
 	echo ${dockerfile}
 	local isMoxaInBroadcaster
-	isMoxaInBroadcaster=$( < /{H}/docker-compose/1.20.0/env/broadcaster.env grep -c "/moxa_e1214.sh")
+	isMoxaInBroadcaster=$( < ${HOME_DIR}/docker-compose/1.20.0/env/broadcaster.env grep -c "/moxa_e1214.sh")
 	##check if script has been run before, to not add duplicates
 	if [ "$isMoxaInBroadcaster" -eq 0 ]; then
 		tee -a /home/user/docker-compose/1.20.0/env/broadcaster.env <<'EOF'
@@ -30,7 +30,7 @@ EOF
 	##doesnt hurt to run again since it's replacing not appending.
 	host=$(hostname)
 	local isMoxaInYaml
-	isMoxaInYaml=$( < {HOME_DIR}/docker-compose/1.20.0/docker-compose.yml grep -c "moxa-config")
+	isMoxaInYaml=$( < "${HOME_DIR}"/docker-compose/1.20.0/docker-compose.yml grep -c "moxa-config")
 	if ["${isMoxaInYaml}" -eq 0]; then
 		line=$(grep -nF broadcaster.tls.ai {HOME_DIR}/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
 		sed -i "${line}i \      - \/home\/user\/moxa-config:\/home\/user\/moxa-config" ${dockerfile}
