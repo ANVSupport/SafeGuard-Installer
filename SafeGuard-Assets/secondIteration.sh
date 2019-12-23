@@ -34,17 +34,19 @@ EOF
 	if [ ${isMoxaInYaml} -eq "0" ]; then
 		line=$(grep -nF broadcaster.tls.ai ${HOME_DIR}/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
 		sed -i "${line}i \      - \/home\/user\/moxa-config:\/home\/user\/moxa-config" ${dockerfile}
+		SuccesfulPrint "broadcaster Edits"
 	else
 		echo "${printRed}""Moxa Edit already in Yml, skipping...""${printWhite}"
 	fi
 
 	sed -i "s|nginx-\${node_name:-localnode}.tls.ai|nginx-$host.tls.ai|g" ${dockerfile}
-	sed -i "s|api.tls.ai|api-$host.tls.ai|g" ${dockerfile} && SuccesfulPrint "Modify docker files"
+	sed -i "s|api.tls.ai|api-$host.tls.ai|g" ${dockerfile} && SuccesfulPrint "Modify YML"
 	cd /home/user/docker-compose/1.20.0/ || exit 1
+	sleep 15
 	if docker-compose -f docker-compose-local-gpu.yml up -d ; then
 		SuccesfulPrint "Image pull"
 	else
-		echo FailedPrint "docker-compose image pull"
+		FailedPrint "docker-compose image pull"
 		echo "Images failed to pull, Perhaps the token timed out?"
 		echo "${printRed}""Generate a new token and login manually, then run runThisAsRoot.sh from the desktop""${printWhite}"
 		exit 1
@@ -56,6 +58,7 @@ EOF
 	echo "2" > /opt/sg.f && SuccesfulPrint "Remove flag" ##marks second iteration has happened
 	rm -f "${HOME_DIR}"/.config/autostart/secondIteration.desktop && SuccesfulPrint "Remove Startup"
 	rm "${HOME_DIR}"/Desktop/runThisAsRoot.sh
+	sed '/docker/d' "${HOME_DIR}"/.profile
 	cat << "EOF"
 	 _____   ____  _   _ ______ 
 	|  __ \ / __ \| \ | |  ____|

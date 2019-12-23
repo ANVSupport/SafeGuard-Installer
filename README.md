@@ -14,7 +14,7 @@ Pre-requisits:
 1. Run this as root with the generated token (lasts for 1 hour)
 
 ```shellscript
-	wget -qO- https://raw.githubusercontent.com/ANVSupport/SafeGuard-Installer/master/main.sh | bash -s -- <TOKEN>
+wget -qO- https://raw.githubusercontent.com/ANVSupport/SafeGuard-Installer/master/main.sh | bash -s -- <TOKEN>
 ```
 2. The machine will reboot, and when prompted with the login screen, login to Ubuntu.    
 A terminal Window should pop up and continue the second half. If it doesn't, Please refer to the Known Issues section.

@@ -150,7 +150,6 @@ DOCKER_COMPOSE_DIR=${HOME_DIR}/${GIT}
 if [ -x "$(command -v apt-get)" ]; then
 
 	# install git
-	echo "Installing git"
 	if ! git --version > /dev/null 2>&1; then
 	    set -e
 	    apt-get -qq update > /dev/null
@@ -224,6 +223,8 @@ usermod -aG docker $(logname)
 [[ "${DASHBOARD}" == "true" ]] && download-dashboard "${DOCKER_COMPOSE_DIR}/${BRANCH}/docker-compose.yml"
 chown -R $(logname):$(logname) ${HOME_DIR}
 docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io"
+echo docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io" >> "${HOME_DIR}"/.profile
+
 
 pushd ${DOCKER_COMPOSE_DIR}/${BRANCH}
 case "${PRODUCT}" in 
