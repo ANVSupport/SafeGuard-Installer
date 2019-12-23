@@ -19,10 +19,10 @@ SecondIteration(){
 	##check if script has been run before, to not add duplicates
 	if [ "$isMoxaInBroadcaster" -eq 0 ]; then
 		tee -a /home/user/docker-compose/1.20.0/env/broadcaster.env <<'EOF'
-		## Modbus plugin integration
-		BCAST_MODBUS_IS_ENABLED=true
-		BCAST_MODBUS_CMD_PATH=/home/user/moxa-config/moxa_e1214.sh
-		BCAST_MODBUS_CAMERA_LIST_PATH=/home/user/moxa-config/cameraList.json
+## Modbus plugin integration
+BCAST_MODBUS_IS_ENABLED=true
+BCAST_MODBUS_CMD_PATH=/home/user/moxa-config/moxa_e1214.sh
+BCAST_MODBUS_CAMERA_LIST_PATH=/home/user/moxa-config/cameraList.json
 EOF
 	else
 		echo "It seems the script has been run already, skipping broadcaster edits..."
@@ -30,9 +30,9 @@ EOF
 	##doesnt hurt to run again since it's replacing not appending.
 	host=$(hostname)
 	local isMoxaInYaml
-	isMoxaInYaml=$( < "${HOME_DIR}"/docker-compose/1.20.0/docker-compose.yml grep -c "moxa-config")
-	if ["${isMoxaInYaml}" -eq 0]; then
-		line=$(grep -nF broadcaster.tls.ai {HOME_DIR}/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
+	isMoxaInYaml=$( < ${HOME_DIR}/docker-compose/1.20.0/docker-compose.yml grep -c "moxa-config")
+	if [ ${isMoxaInYaml} -eq "0" ]; then
+		line=$(grep -nF broadcaster.tls.ai ${HOME_DIR}/docker-compose/1.20.0/docker-compose.yml  | awk -F: '{print $1}') ; line=$((line+2))
 		sed -i "${line}i \      - \/home\/user\/moxa-config:\/home\/user\/moxa-config" ${dockerfile}
 	else
 		echo "${printRed}""Moxa Edit already in Yml, skipping...""${printWhite}"
