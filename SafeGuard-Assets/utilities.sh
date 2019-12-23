@@ -35,19 +35,28 @@ firstIteration() {
 "	    exit 1
 	fi
 	#dependencies and resources
-	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
-	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
 	wget -q --show-progress -O "${repoPath}/Teamviewer.deb" "https://download.teamviewer.com/download/linux/teamviewer_amd64.deb"
 	wget -q --show-progress -O "${HOME_DIR}/Desktop/SafeGuard.AppImage" https://github.com/ANVSupport/SafeGuard-Installer/releases/download/Appimage/FaceSearch-1.20.0-linux-x86_64.AppImage
 	chmod +x "${HOME_DIR}/Desktop/SafeGuard.AppImage" && chown "$(logname)" "${HOME_DIR}/Desktop/SafeGuard.AppImage"
 	echo "==========================================================="
 	echo "                   ${printCyan}Installing Utilities...${printWhite}                "
 	echo "==========================================================="
-	apt-get install vlc curl vim htop net-tools expect parted -yqq > /dev/null &
-	progressBar 15
 	chmod -R +x "${repoPath}"*
+	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
+	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
+	if [[ -f /var/lib/dpkg/lock || -f /var/lib/dpkg/lock-frontend ]]; then
+		echo "${printRed}""Lock Could not be deleted, is the update center open?"
+		read -p "Please close anything that uses apt and enter y when finished. Press N to abort: ""${printWhite}" -n 1 -r $cont
+		case "$cont" in
+		y|Y) installUtils;;
+		n|N) echo "Exiting..."; exit 1;;
+		*) echo "Invalid choice, Exiting.."; exit 1;;
+		esac
+	else
+		installUtils
+	fi
 	cp "${repoPath}"/SafeGuard-Assets/SGLogo.jpg "${HOME_DIR}"/Desktop/SGLogo.jpg
-	apt-get install "${repoPath}/Teamviewer.deb" -y -qq && successfulPrint "TeamViewer" ## To test
+	apt-get install "${repoPath}/Teamviewer.deb" > /dev/null && successfulPrint "TeamViewer" ## To test
 	mv "${repoPath}/SafeGuard-Assets/secondIteration.sh" /opt/secondIteration.sh # prepare it to be run after reboot
 
 	# Call storage mounting script
@@ -86,7 +95,7 @@ EOF
 	local startupFile
 	local startupDir
 	startupDir=${HOME_DIR}/.config/autostart
-	mkdir -R "${startupDir}"
+	mkdir -p "${startupDir}"
 	startupFile="${startupDir}"/secondIteration.desktop
 	> "${startupFile}" # create startup file
 	tee -a ${startupFile} <<EOF && successfulPrint "Startup added" # EOF without quotations or backslash evaluates variables
@@ -126,7 +135,12 @@ EOF
 	rm -rfv /storage/*
 	successfulPrint "System Clean"
 }
-
+installUtils(){
+	rm -rf /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
+	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
+	apt-get install vlc curl vim htop net-tools expect > /dev/null &
+	progressBar 15
+}
 successfulPrint(){
 	echo -e "=================================================================="
 	echo -e "                    $1 ....${printGreen}Success${printWhite}                  "
