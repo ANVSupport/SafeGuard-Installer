@@ -47,7 +47,7 @@ firstIteration() {
 	installUtils
 	cp "${repoPath}"/SafeGuard-Assets/SGLogo.jpg "${HOME_DIR}"/Desktop/SGLogo.jpg
 	apt-get install "${repoPath}/Teamviewer.deb" > /dev/null && successfulPrint "TeamViewer" ## To test
-	mv "${repoPath}/SafeGuard-Assets/secondIteration.sh" /opt/secondIteration.sh # prepare it to be run after reboot
+	cp "${repoPath}/SafeGuard-Assets/secondIteration.sh" /opt/secondIteration.sh # prepare it to be run after reboot
 
 	# Call storage mounting script
 	if  bash "${repoPath}/SafeGuard-Assets/mount.sh" ; then
@@ -104,6 +104,9 @@ chmod +x ${startupFile}
 ln -s "${repoPath}"/SafeGuard-Assets/secondIteration.sh "${HOME_DIR}"/Desktop/runThisAsRoot.sh
 chmod +x "${HOME_DIR}"/Desktop/runThisAsRoot.sh
 echo "xhost +" >> "${HOME_DIR}"/.profile
+echo "${printCyan}""Restarting in 10 Seconds... press Ctrl+C to cancel..""${printWhite}"
+sleep 10
+reboot
 }
 clean(){
 	cat << "EOF"

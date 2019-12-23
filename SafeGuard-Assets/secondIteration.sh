@@ -79,6 +79,8 @@ FailedPrint(){
 	echo -e "                    $1 ....${printRed}Failed!${printWhite}                  "
 	echo -e "=================================================================="
 }
+
+
 if [ "$EUID" -ne 0 ]; then
 	echo "Could not obtain root access.."
 	echo "Is your password set correctly?"
