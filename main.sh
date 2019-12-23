@@ -17,7 +17,7 @@ fi
 
 command -v git >/dev/null 2>&1 ||
 { echo >&2 "Git is not installed. Installing..";
-  apt install -y -qq git && echo "Git Installed"
+  apt install -y -qq git > /dev/null && echo "Git Installed"
 }
 mkdir -p "${HOME_DIR}/SafeGuard-Installer/"
 git clone https://github.com/ANVSupport/SafeGuard-Installer "${HOME_DIR}/SafeGuard-Installer/"  > /dev/null && echo "Repo Cloned"
