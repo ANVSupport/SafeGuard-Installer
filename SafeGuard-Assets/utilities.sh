@@ -61,7 +61,7 @@ firstIteration() {
 	mv "${repoPath}/SafeGuard-Assets/moxa_e1214.sh" "${moxadir}"/moxa_e1214.sh
 	mv "${repoPath}"/SafeGuard-Assets/cameraList.json "${moxadir}"/cameraList.json && successfulPrint "Moxa setup"
 	chmod +x "${moxadir}"* && chown user "${moxadir}"*
-
+	echo "${printCyan}"
 	cat << "EOF"
 	 _____              _          _  _  _                    _____          __        _____                         _          
 	|_   _|            | |        | || |(_)                  / ____|        / _|      / ____|                       | |         
@@ -72,7 +72,8 @@ firstIteration() {
 	                                                __/ |                                                                       
 	                                               |___/                                                                        
 EOF
-	bash "${repoPath}"/compose-oneliner/compose-oneliner.sh -b 1.20.0 -k "${token}" && successfulPrint "SafeGuard Installed"
+	echo "${printWhite}"
+	bash -s "${repoPath}"/compose-oneliner/compose-oneliner.sh -b 1.20.0 -k "${token}" && successfulPrint "SafeGuard Installed"
 	 	ln -s "${HOME_DIR}/docker-compose/1.20.0/docker-compose-local-gpu.yml" "${HOME_DIR}/docker-compose/1.20.0/docker-compose.yml" && successfulPrint "Create Symbolic Link"
 	echo "1" > /opt/sg.f ##flag if the script has been run 
 
@@ -129,6 +130,8 @@ installUtils(){
 	apt-get install vlc curl vim htop net-tools expect -y > /dev/null &
 	progressBar 15
 	wait
+	rm -f /var/lib/dpkg/lock /var/lib/dpkg/lock-frontend
+	dpkg -a --configure # fixes issues with dpkg preventing the script from running...
 }
 successfulPrint(){
 	echo -e "=================================================================="

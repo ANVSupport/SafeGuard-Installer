@@ -200,9 +200,9 @@ echo "====================================================================="
 ## APT update
 set -e
 apt -qq update 
-apt -qq install -y software-properties-common 
-apt-add-repository --yes --update ppa:ansible/ansible 
-apt -qq install -y ansible 
+apt -qq install -y software-properties-common > /dev/null
+apt-add-repository --yes --update ppa:ansible/ansible > /dev/null
+apt -qq install -y ansible > /dev/null
 set +e
 
 [ -d /opt/compose-oneliner ] && rm -rf /opt/compose-oneliner
@@ -231,7 +231,7 @@ chmod +x /opt/docker_login.sh
 pushd ${DOCKER_COMPOSE_DIR}/${BRANCH}
 case "${PRODUCT}" in 
     "BT")
-        ##docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
+        # docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
         exit
     ;;
     "insights")
