@@ -12,9 +12,9 @@ export HOME_DIR
 HOME_DIR=$(eval echo ~"$(logname)")
 SecondIteration(){
 	bash /opt/docker_login.sh
-	dockerfile=/home/user/docker-compose/1.20.0/docker-compose.yml
+	dockerfile=${HOME_DIR}docker-compose/1.20.0/docker-compose.yml
 	echo "Dockerfile set as:"
-	echo ${dockerfile}
+	echo "${dockerfile}"
 	local isMoxaInBroadcaster
 	isMoxaInBroadcaster=$( < ${HOME_DIR}/docker-compose/1.20.0/env/broadcaster.env grep -c "/moxa_e1214.sh")
 	##check if script has been run before, to not add duplicates
@@ -42,9 +42,10 @@ EOF
 
 	sed -i "s|nginx-\${node_name:-localnode}.tls.ai|nginx-$host.tls.ai|g" ${dockerfile}
 	sed -i "s|api.tls.ai|api-$host.tls.ai|g" ${dockerfile} && SuccesfulPrint "Modify YML"
-	cd /home/user/docker-compose/1.20.0/ || exit 1
 	sleep 15
-	if docker-compose -f docker-compose-local-gpu.yml up -d ; then
+	if docker-compose -f "${dockerfile}" up -d ; then
+		SuccesfulPrint "Image pull"
+	elif docker-compose -f "${HOME_DIR}/docker-compose/1.20.0/docker-compose-local-gpu.yml" ; then
 		SuccesfulPrint "Image pull"
 	else
 		FailedPrint "docker-compose image pull"
@@ -94,7 +95,7 @@ if [ "$EUID" -ne 0 ]; then
 	echo "Exiting..."
 	exit 1
 fi
-if [[ -f "/home/user/docker-compose/1.20.0/docker-compose.yml" ]]; then
+if [[ -f "${HOME_DIR}/docker-compose/1.20.0/docker-compose.yml" ]] || [[ -f "${HOME_DIR}/docker-compose/1.20.0/docker-compose-local-gpu.yml" ]]; then
 		SecondIteration && exit 0
 else
 	echo "App not installed, please Install it and try again"
