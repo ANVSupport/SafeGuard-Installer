@@ -42,7 +42,8 @@ EOF
 
 	sed -i "s|nginx-\${node_name:-localnode}.tls.ai|nginx-$host.tls.ai|g" ${dockerfile}
 	sed -i "s|api.tls.ai|api-$host.tls.ai|g" ${dockerfile} && SuccesfulPrint "Modify YML"
-	sleep 15
+	sleep 5
+	docker load < /opt/SG.tar.gz
 	if docker-compose -f "${dockerfile}" up -d ; then
 		SuccesfulPrint "Image pull"
 	elif docker-compose -f "${HOME_DIR}/docker-compose/1.20.0/docker-compose-local-gpu.yml" ; then

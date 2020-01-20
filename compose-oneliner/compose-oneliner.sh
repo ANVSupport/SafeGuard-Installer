@@ -161,22 +161,6 @@ elif [ -x "$(command -v yum)" ]; then
      yum install -y git
 fi
 
-if [[ $TOKEN != "" ]] && [[ $TOKEN == *".json" ]] && [[ -f $TOKEN ]] ;then
-    gcr_user="_json_key" 
-    gcr_key="$(< ${TOKEN} tr '\n' ' ')"
-elif  [[ $TOKEN != "" ]] && [[ ! -f $TOKEN ]] && [[ $TOKEN != *".json" ]]; then
-    gcr_user="oauth2accesstoken"
-    gcr_key=$TOKEN
-fi
-
-COMPOSE_REPO="${COMPOSE_BASH_URL}/${GIT}.git"
-[ -d $DOCKER_COMPOSE_DIR ] || mkdir $DOCKER_COMPOSE_DIR
-[ -d ${DOCKER_COMPOSE_DIR}/${BRANCH} ] && rm -rf ${DOCKER_COMPOSE_DIR:?}/${BRANCH:?}
-
-if ! git clone ${COMPOSE_REPO} -b ${BRANCH} ${DOCKER_COMPOSE_DIR}/${BRANCH}; then
-    echo "No such branch try again"
-    exit 1
-fi
 
 pushd ${DOCKER_COMPOSE_DIR}/${BRANCH}
 DOCKER_COMPOSE_FILE=`find . -type f -regextype posix-extended -regex './docker\-compose\-(local\-)?gpu\.yml'`
@@ -226,6 +210,7 @@ docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io"
 echo \#! /bin/bash > /opt/docker_login.sh
 echo docker login -u "${gcr_user}" -p "${gcr_key}" "https://gcr.io" >> /opt/docker_login.sh
 chmod +x /opt/docker_login.sh
+
 
 
 pushd ${DOCKER_COMPOSE_DIR}/${BRANCH}

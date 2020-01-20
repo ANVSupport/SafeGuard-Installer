@@ -9,6 +9,7 @@
 # Created By Gilad Ben-Nun
 
 HOME_DIR=$(eval echo ~"$(logname)")
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 if [ "$EUID" -ne 0 ]; then
 	echo "Please run this script as root"
 	echo "Exiting..."
@@ -19,9 +20,10 @@ command -v git >/dev/null 2>&1 ||
 { echo >&2 "Git is not installed. Installing..";
   apt install -y -qq git > /dev/null && echo "Git Installed"
 }
-mkdir -p "${HOME_DIR}/SafeGuard-Installer/"
-git clone https://github.com/ANVSupport/SafeGuard-Installer "${HOME_DIR}/SafeGuard-Installer/"  > /dev/null && echo "Repo Cloned"
-source ${HOME_DIR}/SafeGuard-Installer/SafeGuard-Assets/utilities.sh
+source ${SCRIPTPATH}/SafeGuard-Assets/utilities.sh
+mkdir "${HOME_DIR}"/docker-compose/
+cp -r ${SCRIPTPATH}/SafeGuard-Assets/1.20.0 "${HOME_DIR}"/docker-compose/
+rsync -av --progress "${SCRIPTPATH}"/SG.tar.gz /opt/ || echo "Failed to copy images, is the file SG.tar.gz present?" ; exit 1
 
 if [[ ! -f "/opt/sg.f" ]]; then
 	firstIteration "$1"
